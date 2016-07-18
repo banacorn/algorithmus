@@ -1,5 +1,7 @@
+module Main where
+
 inputPath :: FilePath
-inputPath = "./data/input"
+inputPath = "input"
 
 count :: Char -> String -> Int
 count c = length . filter (== c)
