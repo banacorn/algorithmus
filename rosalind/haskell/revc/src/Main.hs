@@ -3,10 +3,10 @@ module Main where
 main :: IO ()
 main = do
     input <- fmap init (readFile "input")
-    putStrLn $ reverse $ map revc input
+    putStrLn $ reverse $ map complement input
 
-revc :: Char -> Char
-revc 'A' = 'T'
-revc 'C' = 'G'
-revc 'G' = 'C'
-revc 'T' = 'A'
+complement :: Char -> Char
+complement 'A' = 'T'
+complement 'C' = 'G'
+complement 'G' = 'C'
+complement 'T' = 'A'
