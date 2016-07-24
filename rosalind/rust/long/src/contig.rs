@@ -61,7 +61,7 @@ pub fn overlap(x: &Contig, y: &Contig) -> Option<Contig> {
     //  longer           ===============
     //  shorter   --------
     //                                 --------
-    for i in 1 .. longer_len + shorter_len {
+    for i in shorter_len/2 .. longer_len + shorter_len/2 {
         let longer_slice_start = cmp::max(0,          i as i32 - shorter_len as i32) as usize;
         let longer_slice_end   = cmp::min(longer_len, i) as usize;
         let longer_slice       = &longer.val[longer_slice_start .. longer_slice_end];
