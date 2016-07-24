@@ -1,7 +1,15 @@
+use std::fmt;
+
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Fasta<'a> {
-    id: &'a str,
-    content: String
+    pub id: &'a str,
+    pub content: String
+}
+
+impl<'a> fmt::Display for Fasta<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} {}", self.id, self.content)
+    }
 }
 
 pub fn parse_fasta(s: &str) -> Vec<Fasta> {
