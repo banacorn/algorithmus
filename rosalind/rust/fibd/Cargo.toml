@@ -1,0 +1,8 @@
+[package]
+name = "fibd"
+version = "0.1.0"
+authors = ["Tîng-Giān Luā <banacorn@gmail.com>"]
+
+[dependencies]
+num = "0.1.34"
+num-traits = "0.1.34"
