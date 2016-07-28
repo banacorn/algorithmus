@@ -12,7 +12,25 @@ impl fmt::Display for Fasta {
     }
 }
 
-pub fn parse_fasta(s: &str) -> Vec<Fasta> {
+pub fn parse_fasta(s: &str) -> Fasta {
+    let mut id = "";
+    let mut content = String::new();
+
+    for line in s.lines() {
+        if &line[0 .. 1] == ">" {
+            id = &line[1..];
+        } else {
+            content.push_str(line);
+        }
+    }
+    Fasta {
+        id: id[1..].to_owned(),
+        content: content
+    }
+}
+
+
+pub fn parse_fastas(s: &str) -> Vec<Fasta> {
     let mut vec = Vec::new();
 
     let mut id = "";
