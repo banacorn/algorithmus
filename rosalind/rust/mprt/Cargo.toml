@@ -1,0 +1,7 @@
+[package]
+name = "mprt"
+version = "0.1.0"
+authors = ["Tîng-Giān Luā <banacorn@gmail.com>"]
+
+[dependencies]
+hyper = "0.9.10"
