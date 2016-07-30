@@ -1,8 +1,10 @@
-use bio::aa::{AA, ToAA};
-use bio::rna::{RNA};
+// use std::iter::FromIterator;
+use bio::aa::{AA, IntoAA};
+use bio::rna::{RNA, IntoRNA};
 use bio::dna;
 use bio::dna::{DNA, DNASequence};
 use std::fmt::Debug;
+use std::collections::VecDeque;
 
 pub trait FastaUnit : Debug + Clone {
     fn parse(char) -> Result<Self, String> where Self: Sized;
@@ -31,13 +33,14 @@ impl<T: FastaUnit> Fasta<T> {
             sequence: seq
         }
     }
-    pub fn aa(&self) -> ReadingFrame<T> {
-        ReadingFrame::new(&self.sequence)
+
+    pub fn aa(&self) -> AASequence<T> {
+        AASequence::new(&self.sequence)
     }
-    //
-    // pub fn reading_frames(&self) -> MultipleReadingFrame {
-    //     MultipleReadingFrame::new(&self.sequence)
-    // }
+
+    pub fn rna(&self) -> RNASequence<T> {
+        RNASequence::new(&self.sequence)
+    }
 }
 
 pub fn parse_fasta<T: FastaUnit>(s: &str) -> Result<Fasta<T>, String> {
@@ -87,31 +90,28 @@ pub fn parse_fastas<T: FastaUnit>(s: &str) -> Vec<Fasta<T>> {
     return vec
 }
 
-#[derive(Debug, Clone)]
-pub struct ReadingFrame<'a, T: 'a + FastaUnit> {
+#[derive(Debug)]
+pub struct AASequence<'a, T: 'a + FastaUnit> {
     sequence: &'a [T],
     cursor: usize
 }
 
-impl<'a, T: FastaUnit> ReadingFrame<'a, T> {
-    pub fn new(s: &'a [T]) -> ReadingFrame<'a, T> {
-        ReadingFrame {
+impl<'a, T: FastaUnit> AASequence<'a, T> {
+    pub fn new(s: &'a [T]) -> AASequence<'a, T> {
+        AASequence {
             sequence: s,
             cursor: 0
         }
     }
 }
 
-impl<'a, T: FastaUnit + ToAA + Copy> Iterator for ReadingFrame<'a, T> {
+impl<'a, T: FastaUnit + IntoAA> Iterator for AASequence<'a, T> {
     type Item = AA;
     fn next(&mut self) -> Option<AA> {
-        if self.cursor + 3 < self.sequence.len() {
-            let aa = ToAA::toAA([
-                self.sequence[self.cursor],
-                self.sequence[self.cursor + 1],
-                self.sequence[self.cursor + 2]
-            ]);
-            self.cursor += 3;
+        let chunk_size = <T as IntoAA>::chunk_size();
+        if self.cursor + chunk_size <= self.sequence.len() {
+            let aa = IntoAA::into_aa(&self.sequence[self.cursor ..]);
+            self.cursor += chunk_size;
             return aa.ok();
         } else {
             None
@@ -119,81 +119,79 @@ impl<'a, T: FastaUnit + ToAA + Copy> Iterator for ReadingFrame<'a, T> {
     }
 }
 
+#[derive(Debug)]
+pub struct RNASequence<'a, T: 'a + FastaUnit> {
+    sequence: &'a [T],
+    cursor: usize
+}
+
+impl<'a, T: FastaUnit> RNASequence<'a, T> {
+    pub fn new(s: &'a [T]) -> RNASequence<'a, T> {
+        RNASequence {
+            sequence: s,
+            cursor: 0
+        }
+    }
+}
+
+impl<'a, T: FastaUnit + IntoRNA + Copy> Iterator for RNASequence<'a, T> {
+    type Item = RNA;
+    fn next(&mut self) -> Option<RNA> {
+        if self.cursor + 1 <= self.sequence.len() {
+            let rna = IntoRNA::into_rna(self.sequence[self.cursor]);
+            self.cursor += 1;
+            return Some(rna)
+        } else {
+            None
+        }
+    }
+}
+
+
 
 // #[derive(Debug, Clone)]
-// pub struct OpenReadingFrame<'a> {
-//     sequence: &'a [AA],
-//     cursor: usize
+// pub struct OpenReadingFrame {
+//     sequence: Vec<AA>,
+//     starts_at: VecDeque<usize>,
+//     stops_at: Option<usize>
 // }
 //
-// impl<'a, T: FastaUnit> ReadingFrame<'a, T> {
-//     pub fn new(s: &'a [T]) -> ReadingFrame<'a, T> {
-//         ReadingFrame {
+// impl OpenReadingFrame {
+//     pub fn new(s: Vec<AA>) -> OpenReadingFrame {
+//         OpenReadingFrame {
 //             sequence: s,
-//             cursor: 0
+//             starts_at: VecDeque::new(),
+//             stops_at: None
 //         }
 //     }
 // }
 //
-// impl<'a, T: FastaUnit + ToAA + Copy> Iterator for ReadingFrame<'a, T> {
-//     type Item = AA;
-//     fn next(&mut self) -> Option<AA> {
-//         if self.cursor + 3 < self.sequence.len() {
-//             let aa = ToAA::toAA([
-//                 self.sequence[self.cursor],
-//                 self.sequence[self.cursor + 1],
-//                 self.sequence[self.cursor + 2]
-//             ]);
-//             self.cursor += 3;
-//             return aa.ok();
-//         } else {
-//             None
-//         }
-//     }
-// }
-//
-//
-// #[derive(Debug)]
-// pub struct MultipleReadingFrame<'a> {
-//     sequence: &'a [DNA],
-//     flipped: bool,
-//     offset: usize
-// }
-//
-// impl<'a> MultipleReadingFrame<'a> {
-//     pub fn new(s: &'a [DNA]) -> MultipleReadingFrame<'a> {
-//         MultipleReadingFrame {
-//             sequence: s,
-//             flipped: false,
-//             offset: 0
-//         }
-//     }
-// }
-//
-// impl<'a> Iterator for MultipleReadingFrame<'a> {
-//     type Item = ReadingFrame;
-//     fn next(&mut self) -> Option<ReadingFrame> {
-//         if !self.flipped && self.offset == 3 {
-//             self.flipped = true;
-//             self.offset = 0;
-//         }
-//
-//         let sequence = if self.flipped {
-//             dna::reverse_complement(&self.sequence[0 .. self.sequence.len() - self.offset])
-//         } else {
-//             self.sequence[self.offset .. ].to_vec()
-//         };
-//
-//         if self.offset < 3 {
-//             // None
-//             let result = ReadingFrame {
-//                 sequence: sequence,
-//                 cursor: self.offset,
-//             };
-//             self.offset += 1;
-//             return Some(result)
-//         } else {
-//             None
-//         }
-//     }
-// }
+// // impl Iterator for OpenReadingFrame {
+// //     type Item = (usize, usize);
+// //     fn next(&mut self) -> Option<(usize, usize)> {
+// //         // println!("{:?}", self.sequence);
+// //
+// //         // let () = &self.sequence.into_iter().enumerate().next();
+// //         for (i, &aa) in (&self.sequence).iter().enumerate() {
+// //             match aa {
+// //                 AA::Met => {
+// //                     self.starts_at.push_back(i);
+// //                 },
+// //                 AA::Stop => {
+// //                     self.stops_at = Some(i);
+// //                     match self.starts_at.pop_front() {
+// //                         Some(start) => {
+// //                             return Some((start, i))
+// //                         }
+// //                         None => {
+// //                             return None
+// //                         }
+// //                     }
+// //                 },
+// //                 _ => {}
+// //             }
+// //             println!("{:?}", aa);
+// //         }
+// //         None
+// //     }
+// // }

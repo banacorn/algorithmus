@@ -1,6 +1,6 @@
 use bio::fasta::FastaUnit;
-use bio::rna::transcribe;
-use bio::aa::{AA, ToAA};
+use bio::rna::{RNA, IntoRNA, transcribe};
+use bio::aa::{AA, IntoAA};
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum DNA {
@@ -20,12 +20,29 @@ impl FastaUnit for DNA {
     }
 }
 
-impl ToAA for DNA {
-    fn toAA(chunk: [DNA; 3]) -> Result<AA, String> {
-        let rna = [transcribe(chunk[0]), transcribe(chunk[1]), transcribe(chunk[2])];
-        ToAA::toAA(rna)
+impl IntoAA for DNA {
+    fn chunk_size() -> usize { 3 }
+    fn into_aa(chunk: &[DNA]) -> Result<AA, String> {
+        if chunk.len() >= 3 {
+            let rna = [transcribe(chunk[0]), transcribe(chunk[1]), transcribe(chunk[2])];
+            IntoAA::into_aa(&rna)
+        } else {
+            Err("input chunk not large enough".to_owned())
+        }
     }
 }
+
+impl IntoRNA for DNA {
+    fn into_rna(dna: DNA) -> RNA {
+        match dna {
+            DNA::T => RNA::U,
+            DNA::C => RNA::C,
+            DNA::A => RNA::A,
+            DNA::G => RNA::G
+        }
+    }
+}
+
 
 pub fn complement(c: DNA) -> DNA {
     match c {

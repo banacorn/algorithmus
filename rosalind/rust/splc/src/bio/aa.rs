@@ -66,9 +66,22 @@ impl FastaUnit for AA {
     }
 }
 
-// from Nucleotides to AAs
-pub trait ToAA {
-    fn toAA([Self; 3]) -> Result<AA, String> where Self: Sized;
+// covert into AAs
+pub trait IntoAA {
+    fn chunk_size() -> usize {
+        1
+    }
+    fn into_aa(chunk: &[Self]) -> Result<AA, String> where Self: Sized;
+}
+
+impl IntoAA for AA {
+    fn into_aa(chunk: &[AA]) -> Result<AA, String> {
+        if chunk.len() >= 1 {
+            Ok(chunk[0])
+        } else {
+            Err("input chunk not large enough".to_owned())
+        }
+    }
 }
 
 pub fn monoisotopic_mass(aa: AA) -> f64 {
