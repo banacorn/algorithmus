@@ -43,3 +43,9 @@
 **/*.eventlog
 **/.stack-work/
 **/cabal.project.local
+target/
+**/*.rs.bk
+Cargo.lock
+target/
+**/*.rs.bk
+Cargo.lock
