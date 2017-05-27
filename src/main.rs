@@ -10,11 +10,10 @@ fn read_input(filepath: &str) -> Result<String> {
     let mut buf_reader = BufReader::new(file);
     let mut contents = String::new();
     buf_reader.read_to_string(&mut contents)?;
-    contents.trim();
-    Ok(contents)
+    Ok(String::from(contents.trim()))
 }
 
 fn main() {
-    let input = read_input("inputs/dna").unwrap();
-    println!("{}", problems::dna::run(&input));
+    let input = read_input("inputs/rna").unwrap();
+    println!("{}", problems::rna::run(&input));
 }
