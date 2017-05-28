@@ -14,6 +14,6 @@ fn read_input(filepath: &str) -> Result<String> {
 }
 
 fn main() {
-    let input = read_input("inputs/rna").unwrap();
-    println!("{}", problems::rna::run(&input));
+    let input = read_input("inputs/revc").unwrap();
+    println!("{}", problems::revc::run(&input));
 }

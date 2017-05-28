@@ -1,10 +1,10 @@
 pub fn run(input: &String) -> String {
-    let mut output = String::new();
-    for c in input.chars() {
-        match c {
-            'T' => output.push('U'),
-            others => output.push(others),
-        }
+    input.chars().map(transcript).collect()
+}
+
+fn transcript(c: char) -> char {
+    match c {
+        'T' => 'U',
+        others => others
     }
-    output
 }
