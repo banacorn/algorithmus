@@ -9,3 +9,8 @@ pub fn read_input(filepath: &str) -> Result<String> {
     buf_reader.read_to_string(&mut contents)?;
     Ok(String::from(contents.trim()))
 }
+
+pub fn write_answer(filepath: &str, answer: &str) {
+    let mut file = File::create(filepath).unwrap();
+    file.write_all(answer.as_bytes()).unwrap();
+}

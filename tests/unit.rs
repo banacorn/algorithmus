@@ -30,3 +30,10 @@ fn iprb() {
     let answer = util::read_input("answers/iprb").unwrap();
     assert_eq!(problems::iprb::run(&input), answer);
 }
+
+#[test]
+fn prot() {
+    let input = util::read_input("inputs/prot").unwrap();
+    let answer = util::read_input("answers/prot").unwrap();
+    assert_eq!(problems::prot::run(&input), answer);
+}
