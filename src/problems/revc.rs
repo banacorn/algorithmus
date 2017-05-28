@@ -1,13 +1,19 @@
-pub fn run(input: &String) -> String {
-    input.chars().map(complement).rev().collect()
+use super::super::bio::*;
+
+pub fn run(input: &str) -> String {
+    parse_dna(input)
+        .into_iter()
+        .map(complement)
+        .rev()
+        .collect::<DNA>()
+        .to_string()
 }
 
-fn complement(c: char)-> char {
-    match c {
-        'A' => 'T',
-        'C' => 'G',
-        'G' => 'C',
-        'T' => 'A',
-        others => others,
+fn complement(nt: Deoxyribonucleotide)-> Deoxyribonucleotide {
+    match nt {
+        Deoxyribonucleotide::A => Deoxyribonucleotide::T,
+        Deoxyribonucleotide::C => Deoxyribonucleotide::G,
+        Deoxyribonucleotide::G => Deoxyribonucleotide::C,
+        Deoxyribonucleotide::T => Deoxyribonucleotide::A,
     }
 }
