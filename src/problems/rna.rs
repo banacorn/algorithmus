@@ -1,10 +1,6 @@
-pub fn run(input: &String) -> String {
-    input.chars().map(transcript).collect()
-}
+use super::super::bio::*;
 
-fn transcript(c: char) -> char {
-    match c {
-        'T' => 'U',
-        others => others
-    }
+pub fn run(input: &str) -> String {
+    transcribe(parse_dna(input))
+        .to_string()
 }
