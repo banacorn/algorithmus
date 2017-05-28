@@ -23,3 +23,10 @@ fn revc() {
     let answer = util::read_input("answers/revc").unwrap();
     assert_eq!(problems::revc::run(&input), answer);
 }
+
+#[test]
+fn iprb() {
+    let input = util::read_input("inputs/iprb").unwrap();
+    let answer = util::read_input("answers/iprb").unwrap();
+    assert_eq!(problems::iprb::run(&input), answer);
+}

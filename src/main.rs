@@ -4,6 +4,6 @@ use rosalind::problems;
 use rosalind::util;
 
 fn main() {
-    let input = util::read_input("inputs/revc").unwrap();
-    println!("{}", problems::revc::run(&input));
+    let input = util::read_input("inputs/iprb").unwrap();
+    println!("{}", problems::iprb::run(&input));
 }
