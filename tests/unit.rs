@@ -32,6 +32,13 @@ fn iprb() {
 }
 
 #[test]
+fn fib() {
+    let input = util::read_input("inputs/fib").unwrap();
+    let answer = util::read_input("answers/fib").unwrap();
+    assert_eq!(problems::fib::run(&input), answer);
+}
+
+#[test]
 fn prot() {
     let input = util::read_input("inputs/prot").unwrap();
     let answer = util::read_input("answers/prot").unwrap();
