@@ -34,6 +34,8 @@ impl fmt::Display for Deoxyribonucleotide {
 //
 // Sequences
 //
+
+#[derive(Debug)]
 pub struct Seq<T>(pub Vec<T>);
 
 impl<T> Seq<T> {
@@ -216,4 +218,54 @@ pub fn translate(chunk: &[Riboucleotide]) -> AminoAcid {
         (&Riboucleotide::G, &Riboucleotide::G, &Riboucleotide::A) => AminoAcid::Gly,
         (&Riboucleotide::G, &Riboucleotide::G, &Riboucleotide::G) => AminoAcid::Gly
     }
+}
+
+//
+// FASTA
+//
+
+#[derive(Debug)]
+pub struct FASTA<T> {
+    pub id: String,
+    pub sequence: Seq<T>
+}
+
+impl<T: fmt::Display> fmt::Display for FASTA<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let &FASTA { ref id, ref sequence } = self;
+        write!(f, ">{}\n", id)?;
+        write!(f, "{}\n", sequence)
+    }
+}
+
+pub fn parse_dna_fasta(input: &str) -> Vec<FASTA<Deoxyribonucleotide>> {
+    let mut fastas = Vec::new();
+
+    let mut id: String = String::new();
+    let mut sequence = Vec::new();
+
+    for (i, line) in input.lines().enumerate() {
+        let id_start = &line[0 .. 1] == ">";
+        if id_start {
+            if i != 0 {
+                // push the last result and clear
+                fastas.push(FASTA {
+                    id: id,
+                    sequence: Seq(sequence)
+                });
+            }
+            id = (&line[1..]).to_string();
+            sequence = Vec::new();
+        } else {
+            sequence.extend(parse_dna(line).0);
+        }
+
+    }
+    // push the last result
+    fastas.push(FASTA {
+        id: id,
+        sequence: Seq(sequence)
+    });
+
+    fastas
 }

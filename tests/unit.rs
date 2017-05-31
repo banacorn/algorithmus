@@ -39,6 +39,13 @@ fn fib() {
 }
 
 #[test]
+fn gc() {
+    let input = util::read_input("inputs/gc").unwrap();
+    let answer = util::read_input("answers/gc").unwrap();
+    assert_eq!(problems::gc::run(&input), answer);
+}
+
+#[test]
 fn prot() {
     let input = util::read_input("inputs/prot").unwrap();
     let answer = util::read_input("answers/prot").unwrap();
