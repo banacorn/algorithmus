@@ -7,5 +7,5 @@ fn main() {
     let input = util::read_input("inputs/subs").unwrap();
     let answer = problems::subs::run(&input);
     println!("{}", answer);
-    // util::write_answer("answers/gc", &answer);
+    util::write_answer("answers/subs", &answer);
 }

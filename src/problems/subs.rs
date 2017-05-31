@@ -1,10 +1,12 @@
 use super::super::bio::*;
+use std::fmt;
 
 pub fn run(input: &str) -> String {
 
     let lines: Vec<&str> = input.lines().collect();
     let haystack = parse_dna(&lines[0]);
     let needle = parse_dna(&lines[1]);
+
     let result = indices(&haystack.0, &needle.0);
     let mut output = String::new();
     for i in result {
@@ -14,7 +16,7 @@ pub fn run(input: &str) -> String {
 }
 
 
-fn indices<T: Eq>(haystack: &[T], needle: &[T]) -> Vec<usize> {
+fn indices<T: Eq + fmt::Debug>(haystack: &[T], needle: &[T]) -> Vec<usize> {
     let mut vec = Vec::new();
     let mut i = 0;
     while i < haystack.len() {
@@ -27,12 +29,11 @@ fn indices<T: Eq>(haystack: &[T], needle: &[T]) -> Vec<usize> {
     vec
 }
 
-fn kmp<T: Eq>(haystack: &[T], needle: &[T]) -> usize {
+fn kmp<T: Eq + fmt::Debug>(haystack: &[T], needle: &[T]) -> usize {
     let mut m = 0;
     let mut i = 0;
 
     let table = build_table(needle);
-
     while m + i < haystack.len() {
         if needle[i] == haystack[m+i] {
             if i + 1 == needle.len() {
@@ -41,12 +42,12 @@ fn kmp<T: Eq>(haystack: &[T], needle: &[T]) -> usize {
             i = i + 1;
         } else {
             match table[i] {
-                None => {
+                0 => {
                     m = m + 1;
                     i = 0;
                 },
-                Some(n) => {
-                    m = m + i - n;
+                n => {
+                    m = m + 1 + i - n;
                     i = n;
                 }
             }
@@ -55,42 +56,32 @@ fn kmp<T: Eq>(haystack: &[T], needle: &[T]) -> usize {
     haystack.len()
 }
 
-fn build_table<T: Eq>(vec: &[T]) -> Vec<Option<usize>> {
-    match vec.len() {
+
+fn build_table<T: Eq>(string: &[T]) -> Vec<usize> {
+
+
+    match string.len() {
         0 => Vec::new(),
-        1 => vec![None],
-        _ => {
-            let mut table = Vec::new();
-            table.push(None);
-            table.push(Some(0));
+        len => {
+            let mut table = vec![0];
 
-            let mut pos = 2;
-            let mut cnd = Some(0);
+            // matched prefix length
+            let mut matched = 0;
 
-            while pos < vec.len() {
-                match cnd {
-                    None => {}, // should never happen
-                    Some(0) => {
-                        if vec[pos] == vec[0] {
-                            table.push(Some(1));
-                            cnd = Some(1);
-                        } else {
-                            table.push(Some(0));
-                        }
-                        pos = pos + 1;
-                    },
-                    Some(n) => {
-                        if vec[pos] == vec[n] {
-                            table.push(Some(n + 1));
-                            cnd = Some(n + 1);
-                            pos = pos + 1;
-                        } else {
-                            cnd = table[n];
-                        }
-                    },
+            // start scanning from the second character of the input string
+            for pos in 1 .. len {
+
+                // in case the character we are looking at matches with the prefix
+                // increase the matched prefix length and keep looking
+                // else reset the matched prefix length
+                if string[matched] == string[pos] {
+                    matched = matched + 1;
+                } else {
+                    matched = 0;
                 }
+                table.push(matched);
             }
-            return table
+            table
         }
     }
 }
