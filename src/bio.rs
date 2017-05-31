@@ -19,7 +19,7 @@ impl fmt::Display for Riboucleotide {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Deoxyribonucleotide {
     A, C, G, T
 }
