@@ -51,3 +51,10 @@ fn prot() {
     let answer = util::read_input("answers/prot").unwrap();
     assert_eq!(problems::prot::run(&input), answer);
 }
+
+#[test]
+fn subs() {
+    let input = util::read_input("inputs/subs").unwrap();
+    let answer = util::read_input("answers/subs").unwrap();
+    assert_eq!(problems::subs::run(&input), answer);
+}

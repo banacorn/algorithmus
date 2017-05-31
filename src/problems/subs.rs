@@ -6,12 +6,11 @@ pub fn run(input: &str) -> String {
     let haystack = parse_dna(&lines[0]);
     let needle = parse_dna(&lines[1]);
     let result = indices(&haystack.0, &needle.0);
-    println!("{:?}", result.len());
     let mut output = String::new();
     for i in result {
         output = output + &i.to_string() + " ";
     }
-    output
+    output.trim().to_string()
 }
 
 
